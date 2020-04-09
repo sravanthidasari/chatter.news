@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-var likeSchema = mongoose.Schema({
-  name: String,
-  likes: [{type: Schema.ObjectId, ref: 'Likes'}],
-  dislikes: [{type: Schema.ObjectId, ref: 'Dilikes'}],
-  value: Boolean
+var reactionSchema = mongoose.Schema({
+  userId: { type: String, required: true },
+  objectType: { type: String, required: true },
+  objectId: { type: String, required: true },
+  reaction: { type: Number, require: true }
 });
 
-module.exports = mongoose.model('Likes', likesSchema)
+module.exports = mongoose.model("Reactions", reactionSchema);

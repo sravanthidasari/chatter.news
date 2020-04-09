@@ -1,5 +1,4 @@
 "use strict";
-const https = require("https");
 const fetch = require("node-fetch");
 
 async function getTopNewsFromBing() {
@@ -11,9 +10,5 @@ async function getTopNewsFromBing() {
   const json = await res.json();
   return json;
 }
-
-// getTopNewsFromBing().then((value) => {
-//   console.log(value);
-// });
 
 module.exports = getTopNewsFromBing;

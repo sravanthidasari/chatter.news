@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
 const newsController = require('./controllers/news');
+const getTopNewsFromBing = require('./controllers/newsApi');
+const seed = require('./controllers/seed');
+
 const mongoose = require('mongoose');
 const cors = require('cors');
 
@@ -31,7 +34,8 @@ mongoose.connection.once('open', ()=>{
 })
 
 
-app.use('/news', newsController)
+app.use('/news', newsController);
+app.use('/seed', seed);
 
 app.get('/', (req, res) => {
   res.send('Hello World');
