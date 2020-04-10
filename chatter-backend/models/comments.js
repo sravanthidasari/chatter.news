@@ -4,6 +4,7 @@ const commentsSchema = mongoose.Schema(
   {
     articleId: { type: String, required: true },
     comment: { type: String, required: true },
+    commentId: { type: String, required: true },
     userId: { type: String, required: true }
   },
   {

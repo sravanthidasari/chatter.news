@@ -7,6 +7,7 @@ app.get('/news', async (req, res) => {
   //   console.log(err);
   // });
 
+  // Test the bing news API
   const apiResult = await newsApi();
   res.json(apiResult);
 });
