@@ -1,0 +1,20 @@
+{
+  "name": "chatter.news",
+  "version": "1.0.0",
+  "description": "A platform to discuss the latest news",
+  "scripts": {
+    "heroku-prebuild": "cd chatter-backend && npm install && cd ../chatter-frontend && npm install && npm run build",
+    "start:web": "cd chatter-frontend && npm start",
+    "start:api": "cd chatter-backend && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sravanthidasari/chatter.news.git"
+  },
+  "author": "sravanthidasari",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sravanthidasari/chatter.news/issues"
+  },
+  "homepage": "https://github.com/sravanthidasari/chatter.news#readme"
+}
