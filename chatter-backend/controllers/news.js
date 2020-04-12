@@ -167,19 +167,17 @@ news.get("/:id/comments", async (req, res) => {
     res.status(404);
     return;
   }
- 
+
   // MongoDB returns the whole doc metadata?
   article = article._doc || article;
-  comments = [comments]
 
-  let comments = await Comments.find({ commentsId: article.id });
+  let comments = await Comments.find({ _id: article._id });
   res.status(200).json(comments);
 });
 
-//Post article comments
+// Create comments route
 news.post("/:id/comments", async (req, res) => {
-  let comments = [];
-  // Find the article for which the comment is being made
+  // Find the article for which the reaction is being made
   let article = await Articles.findOne({ _id: req.params.id });
   if (!article) {
     // If article not found, return 404 status
@@ -190,12 +188,36 @@ news.post("/:id/comments", async (req, res) => {
   // MongoDB returns the whole doc metadata?
   article = article._doc || article;
 
-  let newComment = await comments.push({ commentsId: article._id });
-  res.status(200);
-  res.redirect(comments);
+  // // Find if the same user has already made any comment - example user changing like to dislike etc.
+  // let comment = await Comments.findOne({ articleId: article._id });
+  // if (reaction) {
+  //   // If found, then we just update the existing reaction. Meaning we only allow one reaction per user
+  //   comment = {
+  //     ...comment,
+  //     ...req.body,
+  //     commentId: article.id,
+  //     userId: req.query.userId
+  //   };
+  // } else {
+  //   // Else create a new reaction object with the incoming info and overwrite with info pertaining to the article and user
+  //   reaction = {
+  //     ...req.body,
+  //     commentId: article.id,
+  //     userId: req.query.userId
+  //   };
+  // }
+
+  // We choose to do upsert so it can either be update or insert depending on
+  // whether the user has previously created a reaction or not
+  comment = await Comments.updateOne({ _id: article._id }, comment, {
+    upsert: true
+  });
+
+  // Send the resultant reaction back as the response
+  res.status(200).json(reaction);
 });
 
-//Delete article comments
+// Delete the reaction by the user. User Id will come in the query string parameter for now
 news.delete("/:id/comments", async (req, res) => {
   // Find the article for which the reaction is being made
   let article = await Articles.findOne({ _id: req.params.id });
@@ -207,27 +229,80 @@ news.delete("/:id/comments", async (req, res) => {
 
   // MongoDB returns the whole doc metadata?
   article = article._doc || article;
-  comments= [comments];
 
-  await comments.splice({ articleId: article._id });
-  res.status(200).json(comments);
+  // Find if the same user has already made any reaction - example user changing like to dislike etc.
+  await Comments.deleteOne({ _id: article._id });
+  res.status(200);
 });
 
-//Edit artcile comments
-news.put("/:id/comments", async (req, res) => {
-  // Find the article for which the reaction is being made
-  let article = await Articles.findOne({ _id: req.params.id });
-  if (!article) {
-    // If article not found, return 404 status
-    res.status(404);
-    return;
-  }
+// // Get article comments
+// news.get("/:id/comments", async (req, res) => {
+//   let article = await Articles.findOne({ _id: req.params.id });
+//   if (!article) {
+//     res.status(404);
+//     return;
+//   }
+ 
+//   // MongoDB returns the whole doc metadata?
+//   article = article._doc || article;
+//   comments = [comments]
 
-  // MongoDB returns the whole doc metadata?
-  article = article._doc || article;
+//   let comments = await Comments.find({ commentsId: article.id });
+//   res.status(200).json(comments);
+// });
 
-  await Comments.editComments({ Id: article._id });
-  res.status(200).json(comments);
-});
+// // Post article comments
+// news.post("/:id/comments", async (req, res) => {
+//   let comments = [];
+//   // Find the article for which the comment is being made
+//   let article = await Articles.findOne({ _id: req.params.id });
+//   if (!article) {
+//     // If article not found, return 404 status
+//     res.status(404);
+//     return;
+//   }
+
+//   // MongoDB returns the whole doc metadata?
+//   article = article._doc || article;
+
+//   let newComment = await comments.push({ commentsId: article._id });
+//   res.status(200);
+//   res.redirect(comments);
+// });
+
+// // Delete article comments
+// news.delete("/:id/comments", async (req, res) => {
+//   // Find the article for which the reaction is being made
+//   let article = await Articles.findOne({ _id: req.params.id });
+//   if (!article) {
+//     // If article not found, return 404 status
+//     res.status(404);
+//     return;
+//   }
+
+//   // MongoDB returns the whole doc metadata?
+//   article = article._doc || article;
+//   comments= [comments];
+
+//   await comments.splice({ articleId: article._id });
+//   res.status(200).json(comments);
+// });
+
+// // Edit artcile comments
+// news.put("/:id/comments", async (req, res) => {
+//   // Find the article for which the reaction is being made
+//   let article = await Articles.findOne({ _id: req.params.id });
+//   if (!article) {
+//     // If article not found, return 404 status
+//     res.status(404);
+//     return;
+//   }
+
+//   // MongoDB returns the whole doc metadata?
+//   article = article._doc || article;
+
+//   await Comments.editComments({ Id: article._id });
+//   res.status(200).json(comments);
+// });
 
 module.exports = news;
