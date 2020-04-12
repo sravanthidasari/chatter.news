@@ -3,13 +3,12 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import Articles from "./components/Articles";
 
-
 let baseURL = process.env.REACT_APP_BASEURL;
 if (process.env.NODE_ENV === "development") {
   baseURL = "http://localhost:3003";
 } else {
   baseURL = "https://fathomless-sierra-68956.herokuapp.com";
-
+}
 
 class App extends Component {
   constructor(props) {
@@ -24,7 +23,7 @@ class App extends Component {
           description: " "
         },
         {
-      comments: " "
+          comments: " "
         }
       ]
     };
@@ -33,7 +32,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.getData();
+    // this.getData();
   }
 
   handleChange(event) {
@@ -74,26 +73,26 @@ class App extends Component {
     return (
       <div>
         <h1>Chatter</h1>
-      <table>
-        <tbody>
-          <{this.state.articles.map((name, index) => {
-            return (
-              <tr key={index}>
-                <td>{this.state.articles.name}</td>
-                <td>{this.state.articles.description}</td>
-              </tr>
-            );
-          })}
-        </tbody>
+        <table>
+          <tbody>
+            {this.state.articles.map((name, index) => {
+              return (
+                <tr key={index}>
+                  <td>{this.state.articles.name}</td>
+                  <td>{this.state.articles.description}</td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
         <div>
-        {/* <form onSubmit={this.handleSubmit}> */}
-        <label htmlFor="name">Head Lines</label>
-        <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
-        <input type="submit" value="Latest News Articles" />
-        {/* </form> */}
-        <a href={this.state.searchURL}>{this.state.searchURL}</a>
-        <Articles articles={this.state.articles} /> */}
+          {/* <form onSubmit={this.handleSubmit}> */}
+          <label htmlFor="name">Head Lines</label>
+          <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
+          <input type="submit" value="Latest News Articles" />
+          {/* </form> */}
+          <a href={this.state.searchURL}>{this.state.searchURL}</a>
+          <Articles articles={this.state.articles} />
         </div>
       </div>
     );
