@@ -3,13 +3,7 @@
   "version": "1.0.0",
   "description": "A platform to discuss the latest news",
   "scripts": {
-    "heroku-prebuild": "cd chatter-backend && npm install && cd ../chatter-frontend && npm install && npm run build",
-    "start:web": "cd chatter-frontend && npm start",
-    "start:api": "cd chatter-backend && npm start"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sravanthidasari/chatter.news.git"
+    "postinstall": "npm install --prefix chatter-backend && npm install --prefix chatter-frontend && npm run build --prefix chatter-frontend"
   },
   "author": "sravanthidasari",
   "license": "MIT",
