@@ -1,6 +1,6 @@
 import React from "react";
 import ArticleCard from "./components/ArticleCard";
-import { getNewsArticlesForToday, getNewsArticleDetails, addCommentToArticle } from "./data";
+import { getNewsArticlesForToday, getNewsArticleDetails, addCommentToArticle, addArticleReaction } from "./data";
 
 import "./assets/main.css";
 import "./App.css";
@@ -18,6 +18,7 @@ class App extends React.Component {
 
     this.selectArticle = this.selectArticle.bind(this);
     this.addComment = this.addComment.bind(this);
+    this.postArticleReaction = this.postArticleReaction.bind(this);
   }
 
   componentDidMount() {
@@ -43,16 +44,23 @@ class App extends React.Component {
     return articleDetails;
   }
 
+  async postArticleReaction(article, reaction) {
+    let articleDetails = await addArticleReaction(article._id, reaction, "sravanthi");
+    articleDetails.likeCount = articleDetails.reactions.filter(r => r.reaction === 0).length;
+    articleDetails.dislikeCount = articleDetails.reactions.filter(r => r.reaction === 1).length;
+    articleDetails.commentCount = articleDetails.comments.length;
+
+    this.updateArticleDetails(articleDetails);
+    return articleDetails;
+  }
+
   async addComment(article, comment) {
     // TODO: Replace the user id with the currently logged in user
-    let commentDetails = await addCommentToArticle(article._id.toString(), comment, 'sravanthi');
+    let commentDetails = await addCommentToArticle(article._id.toString(), comment, "sravanthi");
     article = {
       ...article,
       commentCount: article.commentCount + 1,
-      comments: [
-        ...article.comments,
-        commentDetails
-      ]
+      comments: [...article.comments, commentDetails]
     };
 
     this.updateArticleDetails(article);
@@ -107,7 +115,7 @@ class App extends React.Component {
     return (
       <div className="flex flex-wrap justify-center">
         {this.state.articles.map((a, index) => (
-          <ArticleCard className="w-full md:w-3/5" article={a} key={index} onArticleSelected={this.selectArticle} />
+          <ArticleCard className="w-full md:w-5/12" article={a} key={index} onArticleSelected={this.selectArticle} onPostReaction={this.postArticleReaction} />
         ))}
       </div>
     );
@@ -117,7 +125,9 @@ class App extends React.Component {
     return (
       <>
         {this.renderNav()}
-        <div className="container mt-5">{this.state.showArticleMain ? this.renderArticleMain() : this.renderArticleList()}</div>
+        <div className="container mt-5">
+          {this.state.showArticleMain ? this.renderArticleMain() : this.renderArticleList()}
+        </div>
         {/* <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded">Archive</button> */}
       </>
     );

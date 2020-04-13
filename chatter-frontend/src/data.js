@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:3003';
+const baseUrl = "http://localhost:3003";
 
 export async function getNewsArticlesForToday() {
   let response = await fetch(`${baseUrl}/news`);
@@ -16,9 +16,9 @@ export async function getNewsArticleDetails(id) {
 
 export async function addCommentToArticle(articleId, comment, userId) {
   let response = await fetch(`${baseUrl}/news/${articleId}/comments?userId=${userId}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       comment: comment
@@ -38,9 +38,9 @@ export async function getCommentDetails(articleId, commentId) {
 
 export async function addCommentReaction(articleId, commentId, reaction, userId) {
   let response = await fetch(`${baseUrl}/news/${articleId}/comments/${commentId}/reactions?userId=${userId}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       reaction: reaction
@@ -50,4 +50,20 @@ export async function addCommentReaction(articleId, commentId, reaction, userId)
   await response.json();
   const commentDetails = await getCommentDetails(articleId, commentId);
   return commentDetails;
+}
+
+export async function addArticleReaction(articleId, reaction, userId) {
+  let response = await fetch(`${baseUrl}/news/${articleId}/reactions?userId=${userId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      reaction: reaction
+    })
+  });
+
+  await response.json();
+  const articleDetails = await getNewsArticleDetails(articleId);
+  return articleDetails;
 }

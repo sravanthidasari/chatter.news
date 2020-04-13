@@ -8,11 +8,17 @@ export default class ArticleCard extends React.Component {
     super(props);
 
     this.selectArticle = this.selectArticle.bind(this);
+    this.postReaction = this.postReaction.bind(this);
   }
 
   selectArticle(event) {
     event.preventDefault();
     this.props.onArticleSelected(this.props.article);
+  }
+
+  postReaction(event, reaction) {
+    event.preventDefault();
+    this.props.onPostReaction(this.props.article, reaction);
   }
 
   render() {
@@ -28,8 +34,8 @@ export default class ArticleCard extends React.Component {
                 alt={this.props.article.headLine}
                 onClick={this.selectArticle}
               />
-              <Badge className="mb-2" iconName={"fa-thumbs-up"} count={this.props.article.likeCount} />
-              <Badge className="mb-2" iconName={"fa-thumbs-down"} count={this.props.article.dislikeCount} />
+              <Badge className="mb-2" iconName={"fa-thumbs-up"} count={this.props.article.likeCount} clickable={true} onClick={event => this.postReaction(event, 0)} />
+              <Badge className="mb-2" iconName={"fa-thumbs-down"} count={this.props.article.dislikeCount} clickable={true} onClick={event => this.postReaction(event, 1)} />
               <Badge className="mb-2" iconName={"fa-comments"} count={this.props.article.commentCount} />
             </div>
           </div>
