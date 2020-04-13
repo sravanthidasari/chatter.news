@@ -1,100 +1,125 @@
-"use strict";
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import Articles from "./components/Articles";
+import React from "react";
+import ArticleCard from "./components/ArticleCard";
+import { getNewsArticlesForToday, getNewsArticleDetails, addCommentToArticle } from "./data";
 
-let baseURL = process.env.REACT_APP_BASEURL;
-if (process.env.NODE_ENV === "development") {
-  baseURL = "http://localhost:3003";
-} else {
-  baseURL = "https://fathomless-sierra-68956.herokuapp.com";
-}
+import "./assets/main.css";
+import "./App.css";
+import ArticleMain from "./components/ArticleMain";
 
-class App extends Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      bingEndpoint: "https://westus2.api.cognitive.microsoft.com/bing/v7.0/news",
-      apikey: "4c2c58925d16403b833369d435edbe67",
-      query: "&t=",
-      articles: [
-        {
-          name: " ",
-          description: " "
-        },
-        {
-          comments: " "
-        }
-      ]
+      selectedArticle: undefined,
+      showArticleMain: false,
+      articles: []
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.selectArticle = this.selectArticle.bind(this);
+    this.addComment = this.addComment.bind(this);
   }
 
   componentDidMount() {
-    // this.getData();
+    this.getData();
   }
 
-  handleChange(event) {
-    this.setState({ [event.target.id]: event.target.value });
+  async getData() {
+    let articles = await getNewsArticlesForToday();
+    this.setState({ articles: articles });
+
+    for (const article of articles) {
+      this.getArticleDetails(article).then(a => a);
+    }
   }
 
-  handleSubmit(event) {
-    event.preventDefault();
+  async getArticleDetails(article) {
+    let articleDetails = await getNewsArticleDetails(article._id);
+    articleDetails.likeCount = articleDetails.reactions.filter(r => r.reaction === 0).length;
+    articleDetails.dislikeCount = articleDetails.reactions.filter(r => r.reaction === 1).length;
+    articleDetails.commentCount = articleDetails.comments.length;
 
-    const newArticle = {
-      articles: this.state.articles,
-      name: this.state.articles.name,
-      description: this.state.articles.description
+    this.updateArticleDetails(articleDetails);
+    return articleDetails;
+  }
+
+  async addComment(article, comment) {
+    // TODO: Replace the user id with the currently logged in user
+    let commentDetails = await addCommentToArticle(article._id.toString(), comment, 'sravanthi');
+    article = {
+      ...article,
+      commentCount: article.commentCount + 1,
+      comments: [
+        ...article.comments,
+        commentDetails
+      ]
     };
-    console.log(newArticle);
-    const UpdatedArticles = [newArticle, ...this.state.articles];
 
-    this.setState(
-      {
-        searchURL: this.state.baseURL + this.state.apikey + this.state.query + this.state.article.name
-      },
-      () => {
-        fetch(this.state.searchURL)
-          .then(response => {
-            return response.json();
-          })
-          .then(response => {
-            this.setState({ article: response });
-          })
-          .catch(err => {
-            console.error(err);
-          });
-      }
+    this.updateArticleDetails(article);
+  }
+
+  updateArticleDetails(articleDetails) {
+    const copiedArticles = [...this.state.articles];
+    const index = copiedArticles.findIndex(a => a._id === articleDetails._id);
+
+    if (index === -1) {
+      copiedArticles.push(articleDetails);
+    } else {
+      copiedArticles.splice(index, 1, articleDetails);
+    }
+
+    this.setState({ articles: copiedArticles });
+
+    if (this.state.selectedArticle && this.state.selectedArticle._id === articleDetails._id) {
+      this.setState({ selectedArticle: articleDetails });
+    }
+  }
+
+  selectArticle(article) {
+    this.setState({
+      showArticleMain: true,
+      selectedArticle: article
+    });
+  }
+
+  renderNav() {
+    return (
+      <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-6">
+        <div className="flex items-center flex-shrink-0 text-white mr-6">
+          <span className="font-bold text-xl">Chatter.news</span>
+        </div>
+        <div className="inline-flex">
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">Prev</button>
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">Next</button>
+        </div>
+        <div className="flex items-center flex-shrink-0 text-white mr-6">
+          <span className="font-bold text-right">Login</span>
+        </div>
+      </nav>
+    );
+  }
+
+  renderArticleMain() {
+    return <ArticleMain article={this.state.selectedArticle} onAddComment={this.addComment} />;
+  }
+
+  renderArticleList() {
+    return (
+      <div className="flex flex-wrap justify-center">
+        {this.state.articles.map((a, index) => (
+          <ArticleCard className="w-full md:w-3/5" article={a} key={index} onArticleSelected={this.selectArticle} />
+        ))}
+      </div>
     );
   }
 
   render() {
     return (
-      <div>
-        <h1>Chatter</h1>
-        <table>
-          <tbody>
-            {this.state.articles.map((name, index) => {
-              return (
-                <tr key={index}>
-                  <td>{this.state.articles.name}</td>
-                  <td>{this.state.articles.description}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <div>
-          {/* <form onSubmit={this.handleSubmit}> */}
-          <label htmlFor="name">Head Lines</label>
-          <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
-          <input type="submit" value="Latest News Articles" />
-          {/* </form> */}
-          <a href={this.state.searchURL}>{this.state.searchURL}</a>
-          <Articles articles={this.state.articles} />
-        </div>
-      </div>
+      <>
+        {this.renderNav()}
+        <div className="container mt-5">{this.state.showArticleMain ? this.renderArticleMain() : this.renderArticleList()}</div>
+        {/* <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded">Archive</button> */}
+      </>
     );
   }
 }

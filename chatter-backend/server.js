@@ -10,11 +10,12 @@ const PORT = process.env.PORT || 3003;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/news";
 
 app.use(express.json());
+
 const whitelist = ["http://localhost:3000", "https://fathomless-sierra-68956.herokuapp.com"];
 
 const corsOptions = {
   origin: function(origin, callback) {
-    if (!origin || whitelist.findIndex(s => s.toLocaleLowerCase() === origin.toLocaleLowerCase())) {
+    if (!origin || whitelist.findIndex(s => s.toLocaleLowerCase() === origin.toLocaleLowerCase()) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
