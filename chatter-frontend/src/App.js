@@ -1,6 +1,6 @@
 import React from "react";
 import ArticleCard from "./components/ArticleCard";
-import { getNewsArticlesForToday } from "./data";
+import { getNewsArticlesForToday, getNewsArticleDetails, addCommentToArticle } from "./data";
 
 import "./assets/main.css";
 import "./App.css";
@@ -17,6 +17,7 @@ class App extends React.Component {
     };
 
     this.selectArticle = this.selectArticle.bind(this);
+    this.addComment = this.addComment.bind(this);
   }
 
   componentDidMount() {
@@ -26,11 +27,55 @@ class App extends React.Component {
   async getData() {
     let articles = await getNewsArticlesForToday();
     this.setState({ articles: articles });
+
+    for (const article of articles) {
+      this.getArticleDetails(article).then(a => a);
+    }
+  }
+
+  async getArticleDetails(article) {
+    let articleDetails = await getNewsArticleDetails(article._id);
+    articleDetails.likeCount = articleDetails.reactions.filter(r => r.reaction === 0).length;
+    articleDetails.dislikeCount = articleDetails.reactions.filter(r => r.reaction === 1).length;
+    articleDetails.commentCount = articleDetails.comments.length;
+
+    this.updateArticleDetails(articleDetails);
+    return articleDetails;
+  }
+
+  async addComment(article, comment) {
+    // TODO: Replace the user id with the currently logged in user
+    let commentDetails = await addCommentToArticle(article._id.toString(), comment, 'sravanthi');
+    article = {
+      ...article,
+      commentCount: article.commentCount + 1,
+      comments: [
+        ...article.comments,
+        commentDetails
+      ]
+    };
+
+    this.updateArticleDetails(article);
+  }
+
+  updateArticleDetails(articleDetails) {
+    const copiedArticles = [...this.state.articles];
+    const index = copiedArticles.findIndex(a => a._id === articleDetails._id);
+
+    if (index === -1) {
+      copiedArticles.push(articleDetails);
+    } else {
+      copiedArticles.splice(index, 1, articleDetails);
+    }
+
+    this.setState({ articles: copiedArticles });
+
+    if (this.state.selectedArticle && this.state.selectedArticle._id === articleDetails._id) {
+      this.setState({ selectedArticle: articleDetails });
+    }
   }
 
   selectArticle(article) {
-    console.log(article);
-
     this.setState({
       showArticleMain: true,
       selectedArticle: article
@@ -55,7 +100,7 @@ class App extends React.Component {
   }
 
   renderArticleMain() {
-    return <ArticleMain article={this.state.selectedArticle} />;
+    return <ArticleMain article={this.state.selectedArticle} onAddComment={this.addComment} />;
   }
 
   renderArticleList() {
