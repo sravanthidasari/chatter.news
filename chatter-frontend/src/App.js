@@ -26,7 +26,10 @@ class App extends React.Component {
           'Ninety percent of the federal personal protective equipment stockpile had been depleted as the Health and Human Services Department made its "final shipments" of N95 respirators, surgical and face masks, face shields, gowns and gloves, according to new documents released Wednesday by the House Oversight Committee The remaining 10% of the ...',
         image: "https://www.bing.com/th?id=ON.FEFFC96A14690C86D5A48509A4EFE92F&pid=News",
         url: "https://www.usatoday.com/story/news/politics/2020/04/08/coronavirus-almost-all-federal-equipment-stockpile-depleted/2971757001/",
-        date: "2020-04-09T02:12:00.000Z"
+        date: "2020-04-09T02:12:00.000Z",
+        likeCount: 2,
+        dislikeCount: 5,
+        commentCount: 10
       }
     };
   }
