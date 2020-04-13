@@ -1,7 +1,12 @@
 "use strict";
+
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-import Articles from "./components/Articles";
+import ArticleCard from "./components/ArticleCard";
+import Badge from "./components/Badge";
+
+import "./assets/main.css";
+import "./App.css";
 
 let baseURL = process.env.REACT_APP_BASEURL;
 if (process.env.NODE_ENV === "development") {
@@ -10,91 +15,42 @@ if (process.env.NODE_ENV === "development") {
   baseURL = "https://fathomless-sierra-68956.herokuapp.com";
 }
 
-class App extends Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      bingEndpoint: "https://westus2.api.cognitive.microsoft.com/bing/v7.0/news",
-      apikey: "4c2c58925d16403b833369d435edbe67",
-      query: "&t=",
-      articles: [
-        {
-          name: " ",
-          description: " "
-        },
-        {
-          comments: " "
-        }
-      ]
+      article: {
+        headLine: "Almost all of the federal stockpile of personal protective equipment is depleted, new documents show",
+        description:
+          'Ninety percent of the federal personal protective equipment stockpile had been depleted as the Health and Human Services Department made its "final shipments" of N95 respirators, surgical and face masks, face shields, gowns and gloves, according to new documents released Wednesday by the House Oversight Committee The remaining 10% of the ...',
+        image: "https://www.bing.com/th?id=ON.FEFFC96A14690C86D5A48509A4EFE92F&pid=News",
+        url: "https://www.usatoday.com/story/news/politics/2020/04/08/coronavirus-almost-all-federal-equipment-stockpile-depleted/2971757001/",
+        date: "2020-04-09T02:12:00.000Z"
+      }
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
     // this.getData();
   }
 
-  handleChange(event) {
-    this.setState({ [event.target.id]: event.target.value });
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-
-    const newArticle = {
-      articles: this.state.articles,
-      name: this.state.articles.name,
-      description: this.state.articles.description
-    };
-    console.log(newArticle);
-    const UpdatedArticles = [newArticle, ...this.state.articles];
-
-    this.setState(
-      {
-        searchURL: this.state.baseURL + this.state.apikey + this.state.query + this.state.article.name
-      },
-      () => {
-        fetch(this.state.searchURL)
-          .then(response => {
-            return response.json();
-          })
-          .then(response => {
-            this.setState({ article: response });
-          })
-          .catch(err => {
-            console.error(err);
-          });
-      }
-    );
-  }
-
   render() {
     return (
-      <div>
-        <h1>Chatter</h1>
-        <table>
-          <tbody>
-            {this.state.articles.map((name, index) => {
-              return (
-                <tr key={index}>
-                  <td>{this.state.articles.name}</td>
-                  <td>{this.state.articles.description}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <div>
-          {/* <form onSubmit={this.handleSubmit}> */}
-          <label htmlFor="name">Head Lines</label>
-          <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
-          <input type="submit" value="Latest News Articles" />
-          {/* </form> */}
-          <a href={this.state.searchURL}>{this.state.searchURL}</a>
-          <Articles articles={this.state.articles} />
+      <>
+        <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-6">
+          <div className="flex items-center flex-shrink-0 text-white mr-6">
+            <span className="font-bold text-xl">Chatter.news</span>
+          </div>
+        </nav>
+        <div className="container mt-5">
+          <div className="md:flex">
+            <ArticleCard article={this.state.article} />
+            <ArticleCard article={this.state.article} />
+          </div>
         </div>
-      </div>
+        {/* <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded">Archive</button> */}
+      </>
     );
   }
 }
