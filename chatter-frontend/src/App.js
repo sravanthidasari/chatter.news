@@ -4,6 +4,7 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import ArticleCard from "./components/ArticleCard";
 import Badge from "./components/Badge";
+import { getNewsArticlesForToday } from './data';
 
 import "./assets/main.css";
 import "./App.css";
@@ -35,7 +36,12 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    // this.getData();
+    this.getData();
+  }
+
+  async getData() {
+    let articles = await getNewsArticlesForToday();
+    console.log(articles);
   }
 
   render() {

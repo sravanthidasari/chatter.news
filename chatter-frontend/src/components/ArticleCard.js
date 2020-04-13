@@ -10,10 +10,10 @@ export default class ArticleCard extends React.Component {
         <div className="lg:flex lg:items-top">
           <div className="lg:flex-none py-1">
             <div className="flex flex-col justify-center">
-              <img className="rounded-lg" src={this.props.article.image} alt={this.props.article.headLine} />
-              <Badge iconName="fa-thumbs-up" count={this.props.article.likeCount} />
-              <Badge iconName="fa-thumbs-down" count={this.props.article.dislikeCount} />
-              <Badge iconName="fa-comments" count={this.props.article.commentCount} />
+              <img className="rounded-lg mb-2" src={this.props.article.image} alt={this.props.article.headLine} />
+              <Badge className="mb-2" iconName="fa-thumbs-up" count={this.props.article.likeCount} />
+              <Badge className="mb-2" iconName="fa-thumbs-down" count={this.props.article.dislikeCount} />
+              <Badge className="mb-2" iconName="fa-comments" count={this.props.article.commentCount} />
             </div>
           </div>
           <div className="mt-0 lg:mt-0 lg:ml-2">
