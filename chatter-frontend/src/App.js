@@ -15,7 +15,7 @@ class App extends React.Component {
       selectedArticle: undefined,
       showArticleMain: false,
       articles: [],
-      date: moment()
+      date: moment().startOf("date")
     };
 
     this.selectArticle = this.selectArticle.bind(this);
