@@ -15,7 +15,7 @@ const whitelist = ["http://localhost:3000", "https://fathomless-sierra-68956.her
 
 const corsOptions = {
   origin: function(origin, callback) {
-    if (!origin || whitelist.findIndex(s => s.toLocaleLowerCase() === origin.toLocaleLowerCase())) {
+    if (!origin || whitelist.findIndex(s => s.toLocaleLowerCase() === origin.toLocaleLowerCase()) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
