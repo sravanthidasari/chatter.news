@@ -1,6 +1,7 @@
 import React from "react";
 import ArticleCard from "./components/ArticleCard";
 import { getNewsArticlesForToday, getNewsArticleDetails, addCommentToArticle, addArticleReaction } from "./data";
+import moment from 'moment';
 
 import "./assets/main.css";
 import "./App.css";
@@ -13,7 +14,8 @@ class App extends React.Component {
     this.state = {
       selectedArticle: undefined,
       showArticleMain: false,
-      articles: []
+      articles: [],
+      date: moment()
     };
 
     this.selectArticle = this.selectArticle.bind(this);
@@ -93,15 +95,16 @@ class App extends React.Component {
   renderNav() {
     return (
       <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-6">
-        <div className="flex items-center flex-shrink-0 text-white mr-6">
+        <div className="flex items-center flex-shrink-0 text-white w-32">
           <span className="font-bold text-xl">Chatter.news</span>
         </div>
         <div className="inline-flex">
-          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">Prev</button>
-          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">Next</button>
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l mr-5">Prev</button>
+          <div className="font-bold text-xl text-white">{this.state.date.format("MMM Do")}</div>
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r ml-5">Next</button>
         </div>
-        <div className="flex items-center flex-shrink-0 text-white mr-6">
-          <span className="font-bold text-right">Login</span>
+        <div className="flex items-center flex-shrink-0 text-white w-32 font-bold">
+          <p class="text-right w-full">Login</p>
         </div>
       </nav>
     );
