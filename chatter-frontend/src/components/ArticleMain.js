@@ -63,7 +63,7 @@ export default class ArticleMain extends React.Component {
     }
 
     return (
-      <div className="p-2 border-b border-solid border-gray-500 flex justify-between" key={index}>
+      <div className="p-2 border-b border-solid border-gray-400 flex justify-between" key={index}>
         <div className="w-4/5">
           <div className="px-2 font-bold text-blue-700">{comment.userId}</div>
           <div className="px-2">{comment.comment}</div>
@@ -97,7 +97,7 @@ export default class ArticleMain extends React.Component {
     return (
       <input
         type="text"
-        className="w-full mt-4 p-2 bg-gray-200 border border-gray-900"
+        className="w-full mt-4 p-2 bg-gray-200 border border-gray-400 rounded"
         placeholder="Write a comment ..."
         onKeyDown={this.handleKeyDown}
       />
@@ -128,6 +128,13 @@ export default class ArticleMain extends React.Component {
                 </span>
               </div>
             </div>
+          </div>
+          <div className="text-right">
+            <button
+              className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+              onClick={this.props.onBackToList}>
+              Back to list
+            </button>
           </div>
         </div>
         <div className="bg-gray-200 mx-12 pb-3 px-3 rounded-b-lg border-t-2 border-gray-700">

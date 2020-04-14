@@ -1,4 +1,5 @@
 const news = require("express").Router();
+const moment = require("moment");
 
 const ObjectTypes = require("../models/objectTypes");
 const Articles = require("../models/articles");
@@ -27,32 +28,68 @@ function getImageUrl(newsItem) {
 
 // Index route
 news.get("/", async (req, res) => {
-  const topNews = await getTopNewsFromBing();
-  let articles = [];
+  let date = moment().startOf("date");
 
-  if (topNews && topNews.value) {
-    articles = topNews.value.map(v => ({
-      headLine: v.name,
-      description: v.description,
-      image: getImageUrl(v),
-      url: v.url,
-      date: v.datePublished
-    }));
+  if (req.query.date) {
+    let inputDate = moment(req.query.date);
+
+    if (!inputDate.isValid()) {
+      res.status(400).send("Invalid date in the query");
+      return;
+    }
+
+    inputDate = inputDate.startOf("date");
+
+    let testDate = date.clone();
+    testDate.subtract(7, "d");
+    if (inputDate.isBefore(testDate)) {
+      res.status(400).send("Requested date is too old. Can only do 7 days or earlier");
+      return;
+    }
+
+    testDate = date.clone();
+    testDate.add(1, "d");
+    if (inputDate.isSameOrAfter(testDate)) {
+      res.status(400).send("Can't get news for future date");
+      return;
+    }
+
+    date = inputDate;
   }
 
-  let newArticles = [];
-  if (articles && articles.length) {
-    for (let article of articles) {
-      const foundArticles = await Articles.find({ url: article.url });
-      if (!foundArticles || !foundArticles.length || foundArticles.length === 0) {
-        newArticles.push(article);
+  if (date.isSame(moment(), "d")) {
+    const topNews = await getTopNewsFromBing();
+    let articles = [];
+
+    if (topNews && topNews.value) {
+      articles = topNews.value.map(v => ({
+        headLine: v.name,
+        description: v.description,
+        image: getImageUrl(v),
+        url: v.url,
+        date: v.datePublished
+      }));
+    }
+
+    let newArticles = [];
+    if (articles && articles.length) {
+      for (let article of articles) {
+        const foundArticles = await Articles.find({ url: article.url });
+        if (!foundArticles || !foundArticles.length || foundArticles.length === 0) {
+          newArticles.push(article);
+        }
       }
     }
+
+    let _ = await Articles.create(newArticles);
   }
 
-  let _ = await Articles.create(newArticles);
-  let foundArticles = await Articles.find();
+  let nextDate = date.clone();
+  nextDate = nextDate.add(1, "d").startOf("date");
 
+  let foundArticles = await Articles.find({
+    date: { $gte: date.format(), $lte: nextDate.format() }
+  });
   res.status(200).json(foundArticles);
 });
 
@@ -270,7 +307,7 @@ news.delete("/:id/comments/:commentId", async (req, res) => {
   res.sendStatus(200);
 });
 
-// Edit artcile comments
+// Edit article comments
 news.put("/:id/comments/:commentId", async (req, res) => {
   // We need user id for whom the comment is being created
   if (!req.query.userId) {
