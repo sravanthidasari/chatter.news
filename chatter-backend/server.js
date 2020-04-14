@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const newsController = require("./controllers/news");
+const userController = require("./controllers/user");
 const seed = require("./controllers/seed");
 
 const mongoose = require("mongoose");
@@ -11,7 +12,11 @@ const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/news";
 
 app.use(express.json());
 
-const whitelist = ["http://localhost:3000", "https://fathomless-sierra-68956.herokuapp.com"];
+const whitelist = [
+  "http://localhost:3000",
+  "https://localhost:3000",
+  "https://fathomless-sierra-68956.herokuapp.com"
+];
 
 const corsOptions = {
   origin: function(origin, callback) {
@@ -34,6 +39,7 @@ mongoose.connection.once("open", () => {
 });
 
 app.use("/news", newsController);
+app.use("/users", userController);
 app.use("/seed", seed);
 
 app.get("/", (req, res) => {

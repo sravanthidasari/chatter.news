@@ -1,11 +1,12 @@
 import React from "react";
 import ArticleCard from "./components/ArticleCard";
-import { getNewsArticleDetails, addCommentToArticle, addArticleReaction, getArticlesForADate } from "./data";
+import { getNewsArticleDetails, addCommentToArticle, addArticleReaction, getArticlesForADate, addUser } from "./data";
 import moment from "moment";
+import ArticleMain from "./components/ArticleMain";
+import Login from "./components/Login";
 
 import "./assets/main.css";
 import "./App.css";
-import ArticleMain from "./components/ArticleMain";
 
 class App extends React.Component {
   constructor(props) {
@@ -15,7 +16,9 @@ class App extends React.Component {
       selectedArticle: undefined,
       showArticleMain: false,
       articles: [],
-      date: moment().startOf("date")
+      date: moment().startOf("date"),
+      userId: "",
+      name: ""
     };
 
     this.selectArticle = this.selectArticle.bind(this);
@@ -25,10 +28,34 @@ class App extends React.Component {
     this.goNext = this.goNext.bind(this);
     this.startOver = this.startOver.bind(this);
     this.backToList = this.backToList.bind(this);
+    this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   componentDidMount() {
     this.getData();
+  }
+
+  login(userId, name, picture) {
+    console.log(`${userId}: ${name}`);
+
+    addUser(userId, name).then(u => u);
+
+    this.setState({
+      userId: userId,
+      name: name,
+      picture: picture
+    });
+
+    console.log(this.state);
+  }
+
+  logout() {
+    this.setState({
+      userId: undefined,
+      name: undefined,
+      picture: undefined
+    });
   }
 
   async startOver() {
@@ -78,7 +105,12 @@ class App extends React.Component {
   }
 
   async postArticleReaction(article, reaction) {
-    let articleDetails = await addArticleReaction(article._id, reaction, "sravanthi");
+    if (!this.state.userId) {
+      alert("You should be logged in for this ...");
+      return;
+    }
+
+    let articleDetails = await addArticleReaction(article._id, reaction, this.state.userId);
     articleDetails.likeCount = articleDetails.reactions.filter(r => r.reaction === 0).length;
     articleDetails.dislikeCount = articleDetails.reactions.filter(r => r.reaction === 1).length;
     articleDetails.commentCount = articleDetails.comments.length;
@@ -88,8 +120,13 @@ class App extends React.Component {
   }
 
   async addComment(article, comment) {
+    if (!this.state.userId) {
+      alert("You should be logged in for this ...");
+      return;
+    }
+
     // TODO: Replace the user id with the currently logged in user
-    let commentDetails = await addCommentToArticle(article._id.toString(), comment, "sravanthi");
+    let commentDetails = await addCommentToArticle(article._id.toString(), comment, this.state.userId);
     article = {
       ...article,
       commentCount: article.commentCount + 1,
@@ -166,7 +203,7 @@ class App extends React.Component {
   renderNav() {
     return (
       <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-6">
-        <div className="flex items-center flex-shrink-0 text-white w-32 cursor-pointer" onClick={this.startOver}>
+        <div className="flex items-center flex-shrink-0 text-white w-64 cursor-pointer" onClick={this.startOver}>
           <span className="font-bold text-3xl">Chatter.news</span>
         </div>
         <div className="inline-flex">
@@ -174,15 +211,24 @@ class App extends React.Component {
           <div className="font-bold text-xl text-white">{this.state.date.format("MMM Do")}</div>
           {!this.state.showArticleMain ? this.renderNextButton() : null}
         </div>
-        <div className="flex items-center flex-shrink-0 text-white w-32 font-bold">
-          <p className="text-right w-full">Login</p>
+        <div className="flex items-center flex-shrink-0 text-white w-64 font-bold">
+          <Login userId={this.state.userId} name={this.state.name} onLogin={this.login} onLogout={this.logout} />
         </div>
       </nav>
     );
   }
 
   renderArticleMain() {
-    return <ArticleMain article={this.state.selectedArticle} onAddComment={this.addComment} onBackToList={this.backToList} />;
+    return (
+      <ArticleMain
+        article={this.state.selectedArticle}
+        userId={this.state.userId}
+        name={this.state.name}
+        picture={this.state.picture}
+        onAddComment={this.addComment}
+        onBackToList={this.backToList}
+      />
+    );
   }
 
   renderArticleList() {
@@ -208,7 +254,6 @@ class App extends React.Component {
         <div className="container mt-5">
           {this.state.showArticleMain ? this.renderArticleMain() : this.renderArticleList()}
         </div>
-        {/* <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded">Archive</button> */}
       </>
     );
   }

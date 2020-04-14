@@ -1,33 +1,63 @@
-import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
-import FacebookLogin from "react-facebook-login";
+import React from "react";
+import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
 
-export default class login extends React.Component {
-  state = {
-    isLoggedIn: false,
-    userID: '',
-    name: '',
-    email: '',
-    picture: ''
+export default class Login extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {};
+
+    this.customRender = this.customRender.bind(this);
+    this.responseFacebook = this.responseFacebook.bind(this);
+    this.signOut = this.signOut.bind(this);
   }
-  render() {
-    let fbContent;
-    if(this.state.isLoggedIn) {
-    } else {
-      fbContent = (<FacebookLogin
-       appId= "285110752479516" 
-       autoLoad = {true}
-       fields="name,email,picture"
-       onClick={componentClicked} 
-       callback = {responseFacebook} />);
+
+  responseFacebook(response) {
+    console.log(response);
+
+    if (response && response.userID) {
+      if (this.props.onLogin) {
+        console.log("Calling on login method ...");
+        this.props.onLogin(response.userID, response.name, response.picture.data.url);
+      }
     }
+  }
 
+  signOut(event) {
+    event.preventDefault();
+    window.FB.logout();
+    if (this.props.onLogout) {
+      this.props.onLogout();
+    }
+  }
 
+  customRender(localProps) {
     return (
-    <div>
-      <h1>Currently</h1>
-    </div>
-    )}
-}
+      <p className="text-right w-full cursor-pointer" onClick={localProps.onClick}>
+        Login
+      </p>
+    );
+  }
 
-export default login;
+  showNameAndLogout() {
+    return (
+      <p className="w-full text-right cursor-pointer" onClick={this.signOut}>
+        {this.props.name.split(" ")[0] + " (Logout)"}
+      </p>
+    );
+  }
+
+  render() {
+    return this.props.userId ? (
+      this.showNameAndLogout()
+    ) : (
+      <FacebookLogin
+        appId="512346166124705"
+        autoLoad={false}
+        callback={this.responseFacebook}
+        fields="name,email,picture"
+        render={renderProps => this.customRender(renderProps)}
+      />
+    );
+  }
+}

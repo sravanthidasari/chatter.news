@@ -5,6 +5,7 @@ const ObjectTypes = require("../models/objectTypes");
 const Articles = require("../models/articles");
 const Reactions = require("../models/reactions");
 const Comments = require("../models/comments");
+const Users = require("../models/users");
 
 const getTopNewsFromBing = require("./newsApi");
 
@@ -81,7 +82,12 @@ news.get("/", async (req, res) => {
       }
     }
 
-    let _ = await Articles.create(newArticles);
+    try {
+      let _ = await Articles.create(newArticles);
+    } catch (err) {
+      console.log(err);
+      console.log(newArticles);
+    }
   }
 
   let nextDate = date.clone();
@@ -230,6 +236,15 @@ news.post("/:id/comments", async (req, res) => {
     return;
   }
 
+  // Check if the user exists in the system
+  let user = await Users.findOne({ userId: req.query.userId });
+  if (!user) {
+    res.status(400).send("User not available");
+    return;
+  }
+
+  user = user._doc || user;
+
   // Find the article for which the comment is being added
   let article = await Articles.findOne({ _id: req.params.id });
   if (!article) {
@@ -244,7 +259,8 @@ news.post("/:id/comments", async (req, res) => {
   comment = {
     ...req.body,
     articleId: article._id,
-    userId: req.query.userId
+    userId: user.userId,
+    name: user.name
   };
 
   comment = await Comments.create(comment);
@@ -426,8 +442,8 @@ news.delete("/:id/comments/:commentId/reactions", async (req, res) => {
     objectId: req.params.commentId,
     userId: req.query.userId
   });
-  console.log(result);
 
+  console.log(result);
   res.sendStatus(200);
 });
 
