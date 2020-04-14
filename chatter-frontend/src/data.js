@@ -1,7 +1,16 @@
+import { moment } from 'moment';
+
 const baseUrl = "http://localhost:3003";
 
 export async function getNewsArticlesForToday() {
   let response = await fetch(`${baseUrl}/news`);
+  let json = await response.json();
+
+  return json;
+}
+
+export async function getArticlesForADate(date) {
+  let response = await fetch(`${baseUrl}/news?date=${date.format("YYYY-MM-DD")}`);
   let json = await response.json();
 
   return json;

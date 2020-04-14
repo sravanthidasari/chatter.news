@@ -1,6 +1,6 @@
 import React from "react";
 import ArticleCard from "./components/ArticleCard";
-import { getNewsArticlesForToday, getNewsArticleDetails, addCommentToArticle, addArticleReaction } from "./data";
+import { getNewsArticleDetails, addCommentToArticle, addArticleReaction, getArticlesForADate } from "./data";
 import moment from "moment";
 
 import "./assets/main.css";
@@ -49,15 +49,17 @@ class App extends React.Component {
   async goPrevious(event) {
     event.preventDefault();
     this.setState({ date: this.state.date.subtract(1, "days") });
+    this.getData();
   }
 
   async goNext(event) {
     event.preventDefault();
     this.setState({ date: this.state.date.add(1, "days") });
+    this.getData();
   }
 
   async getData() {
-    let articles = await getNewsArticlesForToday();
+    let articles = await getArticlesForADate(this.state.date);
     this.setState({ articles: articles });
 
     for (const article of articles) {
