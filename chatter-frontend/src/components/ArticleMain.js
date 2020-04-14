@@ -8,7 +8,7 @@ export default class ArticleMain extends React.Component {
     super(props);
 
     this.state = {
-      commentReactions: []
+      commentReactions: [],
     };
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -22,7 +22,12 @@ export default class ArticleMain extends React.Component {
   }
 
   async postCommentReaction(articleId, commentId, reaction) {
-    let commentDetails = await addCommentReaction(articleId, commentId, reaction, "sravanthi");
+    if (!this.props.userId) {
+      alert("You should be logged in for this ...");
+      return;
+    }
+
+    let commentDetails = await addCommentReaction(articleId, commentId, reaction, this.props.userId);
     this.processCommentDetails(commentDetails);
   }
 
@@ -65,7 +70,7 @@ export default class ArticleMain extends React.Component {
     return (
       <div className="p-2 border-b border-solid border-gray-400 flex justify-between" key={index}>
         <div className="w-4/5">
-          <div className="px-2 font-bold text-blue-700">{comment.userId}</div>
+          <div className="px-2 font-bold text-blue-700">{comment.name || comment.userId}</div>
           <div className="px-2">{comment.comment}</div>
         </div>
         <div>{rindex !== -1 ? this.renderCommentReactions(this.state.commentReactions[rindex]) : ""}</div>

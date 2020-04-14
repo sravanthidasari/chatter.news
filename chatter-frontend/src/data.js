@@ -1,5 +1,3 @@
-import { moment } from 'moment';
-
 const baseUrl = "http://localhost:3003";
 
 export async function getNewsArticlesForToday() {
@@ -75,4 +73,30 @@ export async function addArticleReaction(articleId, reaction, userId) {
   await response.json();
   const articleDetails = await getNewsArticleDetails(articleId);
   return articleDetails;
+}
+
+export async function addUser(userId, name) {
+  try {
+    let response = await fetch(`${baseUrl}/users/${userId}`);
+    if (response.status === 200) {
+      // We don't need to do anything .. user already exists!
+      return;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+
+  let response = await fetch(`${baseUrl}/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: userId,
+      name: name
+    })
+  });
+
+  let json = await response.json();
+  return json;
 }
