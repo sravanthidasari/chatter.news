@@ -1,1 +1,1 @@
-api: npm run --prefix chatter-backend
+api: npm start --prefix chatter-backend
