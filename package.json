@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A platform to discuss the latest news",
   "scripts": {
-    "postinstall": "npm install --prefix chatter-backend && npm install --prefix chatter-frontend && npm run build --prefix chatter-frontend"
+    "postinstall": "npm install --prefix chatter-backend && npm install --prefix chatter-frontend"
   },
   "author": "sravanthidasari",
   "license": "MIT",
