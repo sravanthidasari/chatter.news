@@ -1,6 +1,6 @@
 # chatter.news
 A platform to discuss the latest news. This app can be used to discuss teh latest news headlines for upto past seven days. The user can like and dislike the news article and also other users comments. The user can use facebook login to login to make comments on the article and make reactions. 
-You can access this project [here](/chatter.news)
+
 
 
 ### Background
