@@ -15,6 +15,7 @@ app.use(express.json());
 const whitelist = [
   "http://localhost:3000",
   "https://localhost:3000",
+  "https://nchatter-f.herokuapp.com",
   "https://fathomless-sierra-68956.herokuapp.com"
 ];
 

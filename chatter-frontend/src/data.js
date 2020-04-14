@@ -1,4 +1,4 @@
-const baseUrl = "http://localhost:3003";
+const baseUrl = "https://nchatter-b.herokuapp.com";
 
 export async function getNewsArticlesForToday() {
   let response = await fetch(`${baseUrl}/news`);
